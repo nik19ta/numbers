@@ -7,4 +7,4 @@ CREATE TABLE numbers (
    PRIMARY KEY ( id )
 );
 
-insert into numbers (code,crate)  values(123, 'wellbeing')
+insert into numbers (code,crate)  values(396746, 1);
