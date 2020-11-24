@@ -1,4 +1,5 @@
 // const db = require('./query');
+// const db = require('./db')
 let express = require('express');
 let app = express();
 
@@ -802,6 +803,13 @@ function search(code) {
 app.get('/get_code', async function (req, res) {
   res.send(search(req.originalUrl.split('?')[1].split('=')[1]))
 });
+
+app.post('/send_feedback_for_save_data', jsonParser, async function (req, res) {
+  let file = fs.readFileSync('./db.json', "utf8");
+  file['data'].push(req.body.data)
+  fs.writeFileSync('./db.json', JSON.stringify(file));
+  res.send({ "status": "error" });
+})
 
 app.listen(3000, () => {
   console.log('Server started...');
