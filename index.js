@@ -2,8 +2,13 @@
 // const db = require('./db')
 let express = require('express');
 let app = express();
+const fs = require("fs") 
+
 
 const bodyParser = require('body-parser');
+
+const jsonParser = bodyParser.json()
+
 app.use(bodyParser.urlencoded({
   extended: true
 }));
@@ -798,19 +803,36 @@ function search(code) {
     if (data[i].code == code) return data[i]
   }
 }
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 
+
+function create_obj(obj) {
+    fs.readFile('./db.json', 'utf8', (err, data) => {
+        if (err) throw err;
+        data = JSON.parse(data);
+        obj.id = data['data'].length;
+        data['data'].push(obj)
+        fs.writeFileSync('./db.json', JSON.stringify(data));
+    });
+}
 
 app.get('/get_code', async function (req, res) {
   res.send(search(req.originalUrl.split('?')[1].split('=')[1]))
 });
 
 app.post('/send_feedback_for_save_data', jsonParser, async function (req, res) {
-  let file = fs.readFileSync('./db.json', "utf8");
-  file['data'].push(req.body.data)
-  fs.writeFileSync('./db.json', JSON.stringify(file));
-  res.send({ "status": "error" });
+ //  try {
+	create_obj(req.body.data)
+  	res.send({ "status": "ok" });
+  //} catch (error) {
+ // 	res.send({ "status": "error" });
+ // }
 })
 
-app.listen(3000, () => {
+app.listen(4000, () => {
   console.log('Server started...');
-});
+})
